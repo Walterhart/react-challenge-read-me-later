@@ -70,7 +70,7 @@ export default function App() {
     function toggleExpand(id) {
         const targetArticle = getTargetArticle(id)
         targetArticle.expanded = !targetArticle.expanded
-        setArticleQueue(savedArticles)
+        setArticleQueue([...savedArticles])
     }
     
 /*-------------------------------------------------------------------------*/
@@ -101,6 +101,8 @@ export default function App() {
         2. The first three functions listed above already work and should not be changed. However, 
            the toggleExpand function (line 70) is currently broken and must be fixed. You *just* need to make a very small (but important) change to fix it! Try to identify and articulate what exactly the issue was and why your solution fixed it.  
 		   
+		   Answer: When the spread operator wasn't used, the code was telling the state to update with what it already had. In this type of situation, React ignores it because it doesn't perceive a difference between the previous state and the current state. When the spread operator is used, even though it has the same content, the array is considered different. React recognizes this, prompting it to update and re-render.
+		   
 		3. Your code for the event handler should be as concise and DRY (Don't Repeat Yourself) as 
            possible, while maintaining readability. 
 		
@@ -109,14 +111,28 @@ export default function App() {
 		   
 		Bonus Challenge: Even though the four functions listed above will work the way they're set up (after you fix the fourth one), there s something unorthodox and arguably "wrong" going on with them — something the React Documentation warns against. See if you can figure out what it is!  
 		
+		Answer: We are mutating state! This is one of the situations where state mutation occurs. However, this is not recommended in the React documentation
+		
  */
 
+	    const onClickHandler = (event) =>{
+		const buttonType = event.target.getAttribute("data-button-type")
+		const articleId = event.target.getAttribute("data-article-id")
+		
+		const eventHandlers = {favorite, archive, trash, toggleExpand}
+
+		if (buttonType) {
+			eventHandlers[buttonType](articleId)
+		}
+	}
+	
 	return (
 		<div className="wrapper">
 			<Header stats={stats} setArticleQueue={setArticleQueue} />
-			<div className="articles-container">
+			<div className="articles-container" onClick={onClickHandler}>
 				{articleQueue.length > 0 ? articleComponents : noArticlesMessage}
 			</div>
 		</div>
 	)
 }
+
